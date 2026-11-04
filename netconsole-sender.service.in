@@ -1,0 +1,20 @@
+[Unit]
+Description=netconsole sender -> @HOST@:@PORT@
+Documentation=file:///usr/local/share/netconsole/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/netconsole_sender.py --host @HOST@ --port @PORT@ --journal --level 6 @UNITS@
+# 断线由脚本自己重连；进程意外退出时由 systemd 拉起
+Restart=always
+RestartSec=5
+# 读取 journal 需要 root 或 systemd-journal 组；用普通用户时改成：
+#   User=netconsole
+#   SupplementaryGroups=systemd-journal
+User=root
+Nice=5
+
+[Install]
+WantedBy=multi-user.target
